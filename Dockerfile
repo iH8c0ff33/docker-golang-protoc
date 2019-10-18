@@ -1,15 +1,14 @@
 FROM golang:1.11-alpine
 
-RUN apk update && \
-    apk add \
+RUN apk add --no-cache git && \
+    apk add --no-cache --virtual build-deps \
     git \
     unzip \
     autoconf \
     automake \
     libtool \
-    alpine-sdk
-
-RUN git clone https://github.com/google/protobuf.git && \
+    alpine-sdk && \
+    git clone https://github.com/google/protobuf.git && \
     cd protobuf && \
     ./autogen.sh && \
     ./configure && \
@@ -18,7 +17,8 @@ RUN git clone https://github.com/google/protobuf.git && \
     ldconfig / && \
     make clean && \
     cd .. && \
-    rm -r protobuf
+    rm -r protobuf && \
+    apk del build-deps
 
 # NOTE: for now, this docker image always builds the current HEAD version of
 # gRPC.  After gRPC's beta release, the Dockerfile versions will be updated to
